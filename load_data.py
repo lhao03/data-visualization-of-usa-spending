@@ -33,6 +33,8 @@ years.reverse()
 
 # list of datasts
 datasets = list(df_pd.values())
+datasets = [df.dropna() for df in datasets]
+
 # dict of year: df
 year_df = dict(zip(years,datasets))
 
@@ -58,25 +60,24 @@ def concat_df(year_df):
     # add year col to each df
     for year, df in year_df.items():
         df["year"] = [year for num in range(0,len(df))]
+    
     # convert to spark df 
     df = year_df.values()
-
-    # creating SparkSession instance 
+    
+    # # creating SparkSession instance 
     spark = SparkSession.builder.getOrCreate()
     
     df_sp = [spark.createDataFrame(df_pd, schema=schema) for df_pd in df]
 
     # concat to each other  
-    final_df = df_sp[0]
+    drop_list = ['total_total', 'inter_governmental']
+    final_df = df_sp[0].select([col for col in df_sp[0].columns if col not in drop_list])
 
     for df_raw in df_sp[1:-1]:
-        final_df = final_df.union(df_raw)
+        final_df = final_df.union(df_raw.select([col for col in df_sp[0].columns if col not in drop_list]))
 
-    final_df.drop('inter_governmental').collect()
     return final_df
 
 final_sp_df = concat_df(year_df=year_df)
 print(final_sp_df.head())
-print(final_sp_df.tail())
-print(final_sp_df.count())
-print(69 * (2017-2004))
+print(final_sp_df.tail(2))
