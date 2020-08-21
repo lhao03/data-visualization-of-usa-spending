@@ -76,6 +76,7 @@ def concat_df(year_df):
     for df_raw in df_sp[1:-1]:
         final_df = final_df.union(df_raw.select([col for col in df_sp[0].columns if col not in drop_list]))
 
+    final_df.toPandas().to_csv('2004-2017_usa_spending.csv')
     return final_df
 
 final_sp_df = concat_df(year_df=year_df)
