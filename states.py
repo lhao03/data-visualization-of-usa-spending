@@ -116,3 +116,9 @@ def get_proper_name(name):
         if name == col_names[i]:
             return proper_names[i]
     return name
+
+# to add status codes
+def get_state_code(row):
+    for i in range(0, len(states_names)):
+        if (states_names[i] == row['region']):
+            return state_codes[i]

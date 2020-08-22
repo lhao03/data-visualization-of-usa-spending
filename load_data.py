@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 import pandas as pd
 from pyspark.sql.types import StructType, StructField, FloatType, StringType, IntegerType
 import pyspark.sql.functions as F
-from states import states_names, state_codes
+from states import states_names, state_codes, get_state_code
 
 # read in the data
 filename = "states_spending.xls"
@@ -20,12 +20,6 @@ df_pd = xl_file.copy()
 # list of years 
 years = list(range(2004, 2018))
 years.reverse()
-
-# to add status codes
-def get_state_code(row):
-    for i in range(0, len(states_names)):
-        if (states_names[i] == row['region']):
-            return state_codes[i]
 
 # list of datasts
 datasets = list(df_pd.values())
