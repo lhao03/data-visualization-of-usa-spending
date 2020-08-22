@@ -1,40 +1,23 @@
 import pandas as pd 
 import plotly.express as px
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import dash 
 import dash_core_components as dcc
 import dash_html_components as html 
 from dash.dependencies import Input, Output
 
-app = dash.Dash(__name__)
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets) 
 
 # import and clean data 
 df = pd.read_csv("2004-2017_usa_spending.csv")
 
 # app layout - components 
 app.layout = html.Div([
-    html.H1("How does you state rank?", style={'text-align':'center'}),
-    # dcc.Dropdown(id='slct_year',
-    # options=[
-    #     {"label": "2005", "value": 2005},
-    #     {"label": "2006", "value": 2006},
-    #     {"label": "2007", "value": 2007},
-    #     {"label": "2008", "value": 2008},
-    #     {"label": "2009", "value": 2009},
-    #     {"label": "2010", "value": 2010},
-    #     {"label": "2011", "value": 2011},
-    #     {"label": "2012", "value": 2012},
-    #     {"label": "2013", "value": 2013},
-    #     {"label": "2014", "value": 2014},
-    #     {"label": "2015", "value": 2015},
-    #     {"label": "2016", "value": 2014},
-    #     {"label": "2017", "value": 2017},],
-    #     multi=False,
-    #     value=2015,
-    #     style={'width': "48%"}
-    #     ),
-    
-    dcc.Slider(id='slct_year',
+    html.H1("How does you state rank?", style={'text-align':'center', 'font-family': 'sans-serif'}),
+    html.Div([
+ dcc.Slider(id='slct_year',
     min=2005,
     max=2017,
     step=None, 
@@ -75,7 +58,8 @@ app.layout = html.Div([
     html.Div(id='output_container', children=[]),
     html.Br(),
 
-    dcc.Graph(id='usa_map', figure={})    
+    dcc.Graph(id='usa_map', figure={}) 
+    ], className="row")
 ])
 
 # connect using the callbacks
@@ -92,15 +76,24 @@ def update_graph(year, funding):
     df_copy = df.copy()
     df_year = df_copy[df_copy["year"] == year]
 
-    fig = px.choropleth(
-        data_frame=df_year, 
-        locationmode='USA-states',
-        locations='status_code',
-        scope='usa',
-        color=funding,
-        color_continuous_scale="Viridis",
-        template='plotly_dark'
-    )
+    
+    # fig = px.choropleth(
+    #     data_frame=df_year, 
+    #     locationmode='USA-states',
+    #     locations='status_code',
+    #     scope='usa',
+    #     color=funding,
+    #     color_continuous_scale="Viridis",
+    #     template='plotly_dark'
+    # )
+
+    fig = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3])
+
+    fig.add_trace(go.Scatter(x=[1, 2, 3], y=[4, 5, 6]),
+              row=1, col=1)
+
+    fig.add_trace(go.Scatter(x=[20, 30, 40], y=[50, 60, 70]),
+              row=1, col=2)
 
     # plotly graph objects 
     # fig = go.Figure(data=[go.Choropleth(
