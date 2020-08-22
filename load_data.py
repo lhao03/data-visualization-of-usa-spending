@@ -5,17 +5,6 @@ from pyspark.sql.types import StructType, StructField, FloatType, StringType, In
 import pyspark.sql.functions as F
 from states import states_names, state_codes
 
-# logFile = "README.md"
-# spark = SparkSession.builder.appName("SimpleApp").getOrCreate()
-# logData = spark.read.text(logFile).cache()
-
-# numAs = logData.filter(logData.value.contains('a')).count()
-# numBs = logData.filter(logData.value.contains('b')).count()
-
-# print(numAs, numBs)
-
-# spark.stop()
-
 # read in the data
 filename = "states_spending.xls"
 xl_file = pd.read_excel(
@@ -85,9 +74,9 @@ def concat_df(year_df):
     for df_raw in df_sp[1:-1]:
         final_df = final_df.union(df_raw.select([col for col in df_sp[0].columns if col not in drop_list]))
 
-    final_df.toPandas().to_csv('2004-2017_usa_spending.csv')
+    final_df = final_df.filter("region != 'District of Columbia'").collect()
+    final_df_pd = pd.DataFrame(final_df)
+    final_df_pd.to_csv('2004-2017_usa_spending.csv')
     return final_df
 
 final_sp_df = concat_df(year_df=year_df)
-print(final_sp_df.head())
-print(final_sp_df.tail(2))

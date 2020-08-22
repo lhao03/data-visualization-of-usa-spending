@@ -48,8 +48,7 @@ state_codes = [
 'WA',
 'WV',
 'WI',
-'WY',
-'WA']
+'WY']
 
 states_names = [
 'Alabama',
@@ -101,5 +100,4 @@ states_names = [
 'Washington',
 'West Virginia',
 'Wisconsin',
-'Wyoming',
-'District of Columbia']
+'Wyoming']

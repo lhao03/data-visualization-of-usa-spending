@@ -75,7 +75,7 @@ app.layout = html.Div([
             #  'align': 'right',
               'display': 'inline-block'
     }),
-], style={'background-color': '#A4BFEB', 'columnCount': 2})
+], style={'background-color': 'black', 'columnCount': 2})
 
 # connect using the callbacks
 @app.callback(
@@ -85,9 +85,10 @@ app.layout = html.Div([
     Input(component_id='slct_fndng', component_property='value'),
     Input(component_id='slct_state', component_property='value')]
 )
-def update_graph(year, funding):
+def update_graph(year, funding, state):
     # option_slctd refers to value
 
+    # data manipulation for the USA map 
     df_copy = df.copy()
     df_year = df_copy[df_copy["year"] == year]
 
@@ -98,27 +99,35 @@ def update_graph(year, funding):
         locations='status_code',
         scope='usa',
         color=funding,
-        color_continuous_scale="Viridis"
+        color_continuous_scale="Viridis",
+        template='plotly_dark'
     )
 
-    # specific state or compare all of the states by average
-    fig_state= make_subplots(rows=3, cols=1,
-    subplot_titles=("Plot 1", "Plot 2", "Plot 3", "Plot 4"))
+    # data manipulation for the state plots 
+    fig_state = ''
+    if state == "USA": 
+        # box whiskter plot 
+        fig_state = px.box(df_year, y=funding, points='all', template='plotly_dark', hover_data=[df_year['region']])
+        fig_state.update_traces(quartilemethod="exclusive") 
+    else: 
+        # specific state or compare all of the states by average
+        fig_state= make_subplots(rows=3, cols=1,
+        subplot_titles=("Plot 1", "Plot 2", "Plot 3", "Plot 4"))
 
-    fig_state.append_trace(go.Scatter(
-    x=[3, 4, 5],
-    y=[1000, 1100, 1200],
-    ), row=1, col=1)
+        fig_state.append_trace(go.Scatter(
+        x=[3, 4, 5],
+        y=[1000, 1100, 1200],
+        ), row=1, col=1)
 
-    fig_state.append_trace(go.Scatter(
-    x=[2, 3, 4],
-    y=[100, 110, 120],
-    ), row=2, col=1)
+        fig_state.append_trace(go.Scatter(
+        x=[2, 3, 4],
+        y=[100, 110, 120],
+        ), row=2, col=1)
 
-    fig_state.append_trace(go.Scatter(
-    x=[0, 1, 2],
-    y=[10, 11, 12]
-    ), row=3, col=1)
+        fig_state.append_trace(go.Scatter(
+        x=[0, 1, 2],
+        y=[10, 11, 12]
+        ), row=3, col=1)
 
     return [fig_usa, fig_state] # the outputs
 
