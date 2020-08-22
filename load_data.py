@@ -3,6 +3,7 @@ from pyspark.sql import SparkSession
 import pandas as pd
 from pyspark.sql.types import StructType, StructField, FloatType, StringType, IntegerType
 import pyspark.sql.functions as F
+from states import states_names, state_codes
 
 # logFile = "README.md"
 # spark = SparkSession.builder.appName("SimpleApp").getOrCreate()
@@ -31,6 +32,12 @@ df_pd = xl_file.copy()
 years = list(range(2004, 2018))
 years.reverse()
 
+# to add status codes
+def get_state_code(row):
+    for i in range(0, len(states_names)):
+        if (states_names[i] == row['region']):
+            return state_codes[i]
+
 # list of datasts
 datasets = list(df_pd.values())
 datasets = [df.dropna() for df in datasets]
@@ -53,6 +60,7 @@ schema = StructType([
     StructField("all_other", FloatType(), True),
     StructField("population_thousands", FloatType(), True),
     StructField("year", IntegerType(), True),
+    StructField("status_code", StringType(), True),
 ])
 
 # func to add year col to each dataset then concat them togehter 
@@ -60,13 +68,14 @@ def concat_df(year_df):
     # add year col to each df
     for year, df in year_df.items():
         df["year"] = [year for num in range(0,len(df))]
+        df['status_code'] = df.apply(get_state_code, axis=1)
     
     # convert to spark df 
     df = year_df.values()
     
-    # # creating SparkSession instance 
+     # # creating SparkSession instance 
     spark = SparkSession.builder.getOrCreate()
-    
+
     df_sp = [spark.createDataFrame(df_pd, schema=schema) for df_pd in df]
 
     # concat to each other  
