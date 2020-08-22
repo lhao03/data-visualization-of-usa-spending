@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+body {
+    background-color: black;
+    font-family: 'Open Sans', sans-serif;
+}
+
+div {
+    text-align:'center';
+    color: '#A4A8D1';
+    background-color: 'black';
+    font-weight: 'bold';
+    padding: '25px 10px';
+}
+
+p {
+    text-align:'left';
+    color: 'black';
+    background-color: '#A4A8D1';
+    font-size: '15px';
+    margin: '15px';
+    padding: '5px'
+}

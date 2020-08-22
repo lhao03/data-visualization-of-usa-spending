@@ -1,5 +1,6 @@
 import pandas as pd 
 import plotly.express as px
+import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import dash 
@@ -9,10 +10,14 @@ from dash.dependencies import Input, Output
 from states import state_codes, states_names
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets) 
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_path='assets') 
 
 # import data
 df = pd.read_csv("2004-2017_usa_spending.csv")
+
+graph_theme = dict(
+    layout=go.Layout(title_font=dict(family="Rockwell", size=24))
+)
 
 def make_mappings():
     list_of_labels_vals = []
@@ -25,8 +30,18 @@ def make_mappings():
 
 # app layout - components 
 app.layout = html.Div([
-    html.H1("State General Expenditures, Per Capita in Dollars", style={'text-align':'center', 'font-family': 'sans-serif'}),
-    
+
+            dbc.Row(
+            [
+                dbc.Col(html.H1("Rate of US Spending", style={'color': '#7D5BA6', 'font-weight': 'bold', 'margin':'25px', 'font-size': '50px'}), width=4),
+                dbc.Col( html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
+    id='p-info', style={'background-color': '#3E5622', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'color': 'white'}),width=8),
+            ]
+        ),
+    html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
+        style={'background-color': '#7D5BA6','margin': '20px 40px', 'text-align': 'center', 'padding': '10px'}),
+
+    html.Div([   
     # div holding slider 
     html.Div([
         # slider for usa map
@@ -57,25 +72,25 @@ app.layout = html.Div([
         {"label": "Police", "value": "police"},
         {"label": "Other", "value": "all_other"},
         {"label": "Population", "value": "population_thousands"}], multi=False,
-        value="total", style={'width': "70%"}),
-         dcc.Graph(id='usa_map', figure={}) 
+        value="total", style={'width': '50%', 'margin': 'auto'}),
         
-    ], style={
-        # 'width': '48%', 
-        # 'display': 'inline-block'
-        }),
+        dcc.Graph(id='usa_map', figure={}, style={'margin': '10px'}),
+        
+    ]),
 
     # div holding graphs that are state specific 
     html.Div([
-        dcc.Dropdown(id='slct_state', options=make_mappings()),
+        dcc.Dropdown(id='slct_state', options=make_mappings(), value="USA", style={'margin': 'auto', 'width': '50%'}),
 
-        dcc.Graph(id='state_figure', figure={},)], 
+        dcc.Graph(id='state_figure', figure={},style={'margin': '5px'})], 
         style={
             'width': '95%',
             #  'align': 'right',
               'display': 'inline-block'
     }),
-], style={'background-color': 'black', 'columnCount': 2})
+], style={ 'columnCount': 2})
+])
+
 
 # connect using the callbacks
 @app.callback(
