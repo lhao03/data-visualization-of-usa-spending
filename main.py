@@ -15,7 +15,7 @@ df = pd.read_csv("2004-2017_usa_spending.csv")
 
 # app layout - components 
 app.layout = html.Div([
-    html.H1("How does you state rank?", style={'text-align':'center', 'font-family': 'sans-serif'}),
+    html.H1("State General Expenditures, Per Capita", style={'text-align':'center', 'font-family': 'sans-serif'}),
     html.Div([
  dcc.Slider(id='slct_year',
     min=2005,
@@ -50,68 +50,69 @@ app.layout = html.Div([
         {"label": "Police", "value": "police"},
         {"label": "Other", "value": "all_other"},
         {"label": "Population", "value": "population_thousands"}],
+        
         multi=False,
         value="total",
-        style={'width': "48%"}
+        style={'width': "70%"}
         ),
+         dcc.Graph(id='usa_map', figure={}) 
+        
+    ], 
+    style={
+        # 'width': '48%', 
+        # 'display': 'inline-block'
+        }
+    ),
 
-    html.Div(id='output_container', children=[]),
-    html.Br(),
+        html.Div([
+       
+        dcc.Graph(id='state_figure', figure={}, ) 
+    ],
+        style={
+            'width': '95%',
+            #  'align': 'right',
+              'display': 'inline-block'
+              }
+    ),
 
-    dcc.Graph(id='usa_map', figure={}) 
-    ], className="row")
-])
+            html.Div([
+            html.H1("Per State", style={'text-align':'center', 'font-family': 'sans-serif'}),
+        ]),
+], style={'background-color': '#8CABBE', 'columnCount': 2})
 
 # connect using the callbacks
 @app.callback(
-    [Output(component_id='output_container', component_property='children'),
-     Output(component_id='usa_map', component_property='figure')],
+    [Output(component_id='usa_map', component_property='figure'),
+    Output(component_id='state_figure', component_property='figure')],
     [Input(component_id='slct_year', component_property='value'),
     Input(component_id='slct_fndng', component_property='value')]
 )
 def update_graph(year, funding):
     # option_slctd refers to value
-    container = "Year: {}".format(year)
 
     df_copy = df.copy()
     df_year = df_copy[df_copy["year"] == year]
 
     
-    # fig = px.choropleth(
-    #     data_frame=df_year, 
-    #     locationmode='USA-states',
-    #     locations='status_code',
-    #     scope='usa',
-    #     color=funding,
-    #     color_continuous_scale="Viridis",
-    #     template='plotly_dark'
-    # )
+    fig = px.choropleth(
+        data_frame=df_year, 
+        locationmode='USA-states',
+        locations='status_code',
+        scope='usa',
+        color=funding,
+        color_continuous_scale="Viridis"
+    )
 
-    fig = make_subplots(rows=1, cols=2, column_widths=[0.7, 0.3])
+    figg= px.choropleth(
+        data_frame=df_year, 
+        locationmode='USA-states',
+        locations='status_code',
+        scope='usa',
+        color=funding,
+        color_continuous_scale="Viridis"
+    )
 
-    fig.add_trace(go.Scatter(x=[1, 2, 3], y=[4, 5, 6]),
-              row=1, col=1)
-
-    fig.add_trace(go.Scatter(x=[20, 30, 40], y=[50, 60, 70]),
-              row=1, col=2)
-
-    # plotly graph objects 
-    # fig = go.Figure(data=[go.Choropleth(
-    #     locationmode='USA-states',
-    #     locations=df_copy['state_code'],
-    #     z=df_copy['police'].astype(float),
-    #     colorscale='Reds',
-    # )])
-
-    # fig.update_layout(
-    #     title_text = "Police Spending",
-    #     title_xanchor="center",
-    #     title_font=dict(size=24),
-    #     title_x=0.5, 
-    #     geo=dict(scope='usa'),
-    # )
-    
-    return container, fig # the outputs
+    return [fig, figg] # the outputs
 
 # run the app 
 if __name__ == "__main__":
