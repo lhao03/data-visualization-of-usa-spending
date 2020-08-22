@@ -6,7 +6,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html 
 from dash.dependencies import Input, Output
-from states import state_codes, states_names
+from states import state_codes, states_names, get_state, get_proper_name
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_path='assets') 
@@ -29,13 +29,9 @@ def make_mappings():
 
 # app layout - components 
 app.layout = html.Div([
-    html.Div([
-        html.H1("Rate of US Spending", style={'color': '#7D5BA6', 'font-weight': 'bold', 'margin':'25px', 'font-size': '50px'}),
-    html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
-    id='p-info', style={'background-color': '#3E5622', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'color': 'white'}),
-    ], style={ 'columnCount': 2}),
-    html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
-        style={'background-color': '#7D5BA6','margin': '20px 40px', 'text-align': 'center', 'padding': '10px'}),
+    html.H1("Rate of US Spending", style={'font-weight': 'bold', 'margin':'auto', 'font-size': '50px', 'text-align':'center'}),
+    html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over 2005 to 2017.",
+        style={'background-color': 'white','margin': '20px 40px', 'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 
     html.Div([   
     # div holding slider 
@@ -70,7 +66,7 @@ app.layout = html.Div([
         {"label": "Population", "value": "population_thousands"}], multi=False,
         value="total", style={'width': '50%', 'margin': 'auto'}),
         
-        dcc.Graph(id='usa_map', figure={}, style={'margin': '10px'}),
+        html.Div([dcc.Graph(id='usa_map', figure={}),], style={'margin': '10px', 'background-color': '#EEE5E9', 'borderRadius': '25px'}),
         
     ]),
 
@@ -78,20 +74,27 @@ app.layout = html.Div([
     html.Div([
         dcc.Dropdown(id='slct_state', options=make_mappings(), value="USA", style={'margin': 'auto', 'width': '50%'}),
 
-        dcc.Graph(id='state_figure', figure={},style={'margin': '5px'})], 
+        dcc.Graph(id='state_figure', figure={},style={'margin-top': '10px'})], 
         style={
             'width': '95%',
             #  'align': 'right',
               'display': 'inline-block'
     }),
-], style={ 'columnCount': 2})
+], style={ 'columnCount': 2}),
+html.Div([
+    html.H1("A look at Incarceration Rates", style={'text-align':'center'}),
+    dcc.Graph(id='incarceration_figure', figure={}),
+]),
+    html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
+    id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
 ], style={})
 
 
 # connect using the callbacks
 @app.callback(
     [Output(component_id='usa_map', component_property='figure'),
-    Output(component_id='state_figure', component_property='figure')],
+    Output(component_id='state_figure', component_property='figure'),
+    Output(component_id='incarceration_figure', component_property='figure')],
     [Input(component_id='slct_year', component_property='value'),
     Input(component_id='slct_fndng', component_property='value'),
     Input(component_id='slct_state', component_property='value')]
@@ -111,36 +114,22 @@ def update_graph(year, funding, state):
         scope='usa',
         color=funding,
         color_continuous_scale="Viridis",
-        template='plotly_dark'
+        template='plotly_white'
     )
 
     # data manipulation for the state plots 
     fig_state = ''
     if state == "USA": 
         # box whiskter plot 
-        fig_state = px.box(df_year, y=funding, points='all', template='plotly_dark', hover_data=[df_year['region']])
+        fig_state = px.box(df_year, y=funding, points='all', template='plotly_white', hover_data=[df_year['region']], title="{funding} per state.".format(funding=get_proper_name(funding)))
         fig_state.update_traces(quartilemethod="exclusive") 
     else: 
         # specific state or compare all of the states by average
-        fig_state= make_subplots(rows=3, cols=1,
-        subplot_titles=("Plot 1", "Plot 2", "Plot 3", "Plot 4"))
+        df_state = df_copy[df_copy['status_code'] == state]
+        print(df_state)
+        fig_state= px.line(df_state,template='plotly_white',x="year", y=funding, title="{funding} for {state} over 2005 - 2017".format(funding=get_proper_name(funding), state=get_state(state)))
 
-        fig_state.append_trace(go.Scatter(
-        x=[3, 4, 5],
-        y=[1000, 1100, 1200],
-        ), row=1, col=1)
-
-        fig_state.append_trace(go.Scatter(
-        x=[2, 3, 4],
-        y=[100, 110, 120],
-        ), row=2, col=1)
-
-        fig_state.append_trace(go.Scatter(
-        x=[0, 1, 2],
-        y=[10, 11, 12]
-        ), row=3, col=1)
-
-    return [fig_usa, fig_state] # the outputs
+    return [fig_usa, fig_state, fig_usa] # the outputs
 
 # run the app 
 if __name__ == "__main__":
