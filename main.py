@@ -14,40 +14,61 @@ df = pd.read_csv("2004-2017_usa_spending.csv")
 # app layout - components 
 app.layout = html.Div([
     html.H1("How does you state rank?", style={'text-align':'center'}),
-    dcc.Dropdown(id='slct_year',
-    options=[
-        {"label": "2004", "value": 2004},
-        {"label": "2005", "value": 2005},
-        {"label": "2006", "value": 2006},
-        {"label": "2007", "value": 2007},
-        {"label": "2008", "value": 2008},
-        {"label": "2009", "value": 2009},
-        {"label": "2010", "value": 2010},
-        {"label": "2011", "value": 2011},
-        {"label": "2012", "value": 2012},
-        {"label": "2013", "value": 2013},
-        {"label": "2014", "value": 2014},
-        {"label": "2015", "value": 2015},
-        {"label": "2016", "value": 2014},
-        {"label": "2017", "value": 2017},],
-        multi=False,
-        value=2015,
-        style={'width': "48%"}
-        ),
+    # dcc.Dropdown(id='slct_year',
+    # options=[
+    #     {"label": "2005", "value": 2005},
+    #     {"label": "2006", "value": 2006},
+    #     {"label": "2007", "value": 2007},
+    #     {"label": "2008", "value": 2008},
+    #     {"label": "2009", "value": 2009},
+    #     {"label": "2010", "value": 2010},
+    #     {"label": "2011", "value": 2011},
+    #     {"label": "2012", "value": 2012},
+    #     {"label": "2013", "value": 2013},
+    #     {"label": "2014", "value": 2014},
+    #     {"label": "2015", "value": 2015},
+    #     {"label": "2016", "value": 2014},
+    #     {"label": "2017", "value": 2017},],
+    #     multi=False,
+    #     value=2015,
+    #     style={'width': "48%"}
+    #     ),
+    
+    dcc.Slider(id='slct_year',
+    min=2005,
+    max=2017,
+    step=None, 
+    marks={
+        2005: '2005',
+        2006: '2006',
+        2007: '2007',
+        2008: '2008',
+        2009: '2009',
+        2010: '2010',
+        2011: '2011', 
+        2012: '2012',
+        2013: '2013',
+        2014: '2014',
+        2015: '2015',
+        2016: '2016',
+        2017: '2017'
+    },
+    value=2005    
+    ),
     
      dcc.Dropdown(id='slct_fndng',
     options=[
-        {"label": "total", "value": "Total Spending"},
-        {"label": "2005", "value": "Elementary and Secondary Education"},
-        {"label": "2006", "value": "Higher Education"},
-        {"label": "2007", "value": "Public Welfare"},
-        {"label": "2008", "value": "Health and Hospital"},
-        {"label": "2009", "value": "Highways"},
-        {"label": "2010", "value": "Police"},
-        {"label": "2011", "value": "Other"},
-        {"label": "2012", "value": "population"}],
+        {"label": "Total Spending", "value": "total"},
+        {"label": "Elementary and Secondary Education", "value": "elementary_and_secondary_edu"},
+        {"label": "Higher Education", "value": "higher_edu"},
+        {"label": "Public Welfare", "value": "public_welfare"},
+        {"label": "Health and Hospital", "value": "health_and_hospitals"},
+        {"label": "Highways", "value": "highways"},
+        {"label": "Police", "value": "police"},
+        {"label": "Other", "value": "all_other"},
+        {"label": "Population", "value": "population_thousands"}],
         multi=False,
-        value="Total Spending",
+        value="total",
         style={'width': "48%"}
         ),
 
@@ -66,23 +87,18 @@ app.layout = html.Div([
 )
 def update_graph(year, funding):
     # option_slctd refers to value
-    print(year)
-    print(type(year))
-
     container = "Year: {}".format(year)
 
     df_copy = df.copy()
     df_year = df_copy[df_copy["year"] == year]
-    df_fund = df_year["police"]
 
     fig = px.choropleth(
-        data_frame=df_fund, 
+        data_frame=df_year, 
         locationmode='USA-states',
-        locations='status_codes',
+        locations='status_code',
         scope='usa',
-        color='police',
-        # hover_data=['region','police'],
-        color_continuous_scale=px.colors.sequential.YlOrRd,
+        color=funding,
+        color_continuous_scale="Viridis",
         template='plotly_dark'
     )
 
