@@ -1,6 +1,5 @@
 import pandas as pd 
 import plotly.express as px
-import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import dash 
@@ -30,24 +29,17 @@ def make_mappings():
 
 # app layout - components 
 app.layout = html.Div([
-
-            dbc.Row(
-            [
-                dbc.Col(html.H1("Rate of US Spending", style={'color': '#7D5BA6', 'font-weight': 'bold', 'margin':'25px', 'font-size': '50px'}), width=4),
-                dbc.Col( html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
-    id='p-info', style={'background-color': '#3E5622', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'color': 'white'}),width=8),
-            ]
-        ),
-    dbc.Row([
-        html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
+    html.Div([
+        html.H1("Rate of US Spending", style={'color': '#7D5BA6', 'font-weight': 'bold', 'margin':'25px', 'font-size': '50px'}),
+    html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
+    id='p-info', style={'background-color': '#3E5622', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'color': 'white'}),
+    ], style={ 'columnCount': 2}),
+    html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
         style={'background-color': '#7D5BA6','margin': '20px 40px', 'text-align': 'center', 'padding': '10px'}),
-    ]),
 
-    dbc.Row([
-        html.Div([   
+    html.Div([   
     # div holding slider 
-    dbc.Col([
-            html.Div([
+    html.Div([
         # slider for usa map
         dcc.Slider(id='slct_year', min=2005, max=2017, step=None, marks={
         2005: '2005',
@@ -81,11 +73,9 @@ app.layout = html.Div([
         dcc.Graph(id='usa_map', figure={}, style={'margin': '10px'}),
         
     ]),
-    ]),
 
     # div holding graphs that are state specific 
-    dbc.Col([
-            html.Div([
+    html.Div([
         dcc.Dropdown(id='slct_state', options=make_mappings(), value="USA", style={'margin': 'auto', 'width': '50%'}),
 
         dcc.Graph(id='state_figure', figure={},style={'margin': '5px'})], 
@@ -94,10 +84,8 @@ app.layout = html.Div([
             #  'align': 'right',
               'display': 'inline-block'
     }),
-    ]),
-], style={ 'columnCount': 2}),
-    ])
-])
+], style={ 'columnCount': 2})
+], style={})
 
 
 # connect using the callbacks
