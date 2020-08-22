@@ -38,12 +38,16 @@ app.layout = html.Div([
     id='p-info', style={'background-color': '#3E5622', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'color': 'white'}),width=8),
             ]
         ),
-    html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
+    dbc.Row([
+        html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over the entire time span",
         style={'background-color': '#7D5BA6','margin': '20px 40px', 'text-align': 'center', 'padding': '10px'}),
+    ]),
 
-    html.Div([   
+    dbc.Row([
+        html.Div([   
     # div holding slider 
-    html.Div([
+    dbc.Col([
+            html.Div([
         # slider for usa map
         dcc.Slider(id='slct_year', min=2005, max=2017, step=None, marks={
         2005: '2005',
@@ -77,9 +81,11 @@ app.layout = html.Div([
         dcc.Graph(id='usa_map', figure={}, style={'margin': '10px'}),
         
     ]),
+    ]),
 
     # div holding graphs that are state specific 
-    html.Div([
+    dbc.Col([
+            html.Div([
         dcc.Dropdown(id='slct_state', options=make_mappings(), value="USA", style={'margin': 'auto', 'width': '50%'}),
 
         dcc.Graph(id='state_figure', figure={},style={'margin': '5px'})], 
@@ -88,7 +94,9 @@ app.layout = html.Div([
             #  'align': 'right',
               'display': 'inline-block'
     }),
-], style={ 'columnCount': 2})
+    ]),
+], style={ 'columnCount': 2}),
+    ])
 ])
 
 
