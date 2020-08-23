@@ -85,7 +85,8 @@ app.layout = html.Div([
 ], style={ 'columnCount': 2}),
 html.Div([
     html.H1("A look at Incarceration Rates", style={'text-align':'center'}),
-
+    html.P("Select a year and incarceration category.",
+        style={'background-color': 'white','margin': '20px 80px', 'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
         html.Div([
         dcc.Slider(id='slct_year_inc', min=2005, max=2017, step=None, marks={
         2013: '2013',
@@ -145,7 +146,8 @@ def update_graph(year, funding, state, year_inc, type_inc):
         scope='usa',
         color=funding,
         color_continuous_scale="Viridis",
-        template='plotly_white'
+        template='plotly_white',
+        hover_data=[df_year['region']],
     )
 
     # data manipulation for the state plots 
@@ -172,7 +174,8 @@ def update_graph(year, funding, state, year_inc, type_inc):
         scope='usa',
         color=type_inc,
         color_continuous_scale="Viridis",
-        template='plotly_white'
+        template='plotly_white',
+        hover_data=[df_year_inc['region']],
     )
 
     return [fig_usa, fig_state, fig_incarceration] # the outputs
