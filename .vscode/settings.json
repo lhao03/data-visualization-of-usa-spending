@@ -1,4 +1,4 @@
 {
     "git.ignoreLimitWarning": true,
-    "python.pythonPath": "c:\\Users\\moshi\\anaconda3\\envs\\spark\\python.exe"
+    "python.pythonPath": "venv\\Scripts\\python.exe"
 }
