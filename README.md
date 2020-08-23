@@ -15,7 +15,7 @@ First you need data for a data visualization, so I went hunting for data. The da
 I would use alot more data and use more categorical features such as race, gender, and state politcal affiliation, and this also leads on to my second point that I would one-hot these values. Furthermore I would normalise these values as well. 
 
 ## To try it out yourself
-`pip` install all the required arguments. Then run `python main.py`.
+`pip` install all the required arguments. Then run `python app.py`.
 
 ### links to data
 - [USA Spending](https://state-local-finance-data.taxpolicycenter.org/pages.cfm)
