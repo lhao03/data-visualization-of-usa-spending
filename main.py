@@ -120,7 +120,7 @@ html.Div([
     dcc.Graph(id='incarceration_figure', figure={}, style={'margin': '10px'}),
 ]),
 html.Div([
-    html.H1("How does Spending Impact the Total Incarceration Population?", style={'text-align':'center'}),
+    html.H1("How does Spending Impact the Incarceration Population per 100K?", style={'text-align':'center'}),
         html.P("Select a year and incarceration category to see the relationships between spending and race.",
         style={'background-color': 'white','margin': '20px 80px',
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
@@ -318,7 +318,7 @@ highways, police, population_thousands, hispanic, white, black, asian, indigneou
     fig_incarceration_spending.update_layout(
     title="{category} of {year}".format(category=funding_total, year=year_total),
     yaxis_title=funding_total,
-    xaxis_title="Total Correctional Population")
+    xaxis_title="Correctional Population per 100K")
     
     # model 
     # NOT asking for total, other, year
@@ -331,9 +331,11 @@ highways, police, population_thousands, hispanic, white, black, asian, indigneou
         list_vals = [total, elementary_and_secondary_edu, higher_edu, public_welfare, health_and_hospitals, highways, police,
      other, population_thousands, year, hispanic, white, black, asian, indigneous]
         if (len(list_vals)==15):
-            test_predictions = predict(list_vals)
+            test_predictions_total = predict(list_vals)
+            test_predictions = "Total: {total}. Per 100K: {pro}".format(total=str(test_predictions_total),pro=str((float(test_predictions_total)/population_thousands)*100))
     except:
         test_predictions = 'Please check your inputs'
+    
     return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending, test_predictions] # the outputs
 
 # run the app 
