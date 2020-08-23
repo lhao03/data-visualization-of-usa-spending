@@ -5,13 +5,14 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from inputs import to_dataframe
 
 checkpoint_path = "hack-for-people/cp.ckpt"
 
 
 def build_model():
     model = keras.Sequential([
-    layers.Dense(64, activation='relu', input_shape=[len(train_dataset.keys())]),
+    layers.Dense(64, activation='relu', input_shape=[15]),
     layers.Dense(64, activation='relu'),
     layers.Dense(1)
   ])
@@ -29,7 +30,7 @@ def build_model():
 model = build_model()
 model.load_weights(checkpoint_path)
 # test predictions
-
-normed_test_data = 
-
-test_predictions = model.predict(normed_test_data)
+listt = ['7991.245605' ,	'1681.732666' ,	'827.223572' ,	'1558.236084' ,
+	'1478.948486' ,	'322.951813' ,	'235.153625', 	'1886.999268', 	'4892.252930', 	'2015'  ,	'5.7', 	'63.6' ,	'26.8' ,	'1.5', 	'0.2' 	]
+test_predictions = model.predict(to_dataframe(listt))
+print(test_predictions)
