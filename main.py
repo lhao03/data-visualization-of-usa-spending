@@ -14,6 +14,8 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_
 # import data
 df = pd.read_csv("2004-2017_usa_spending.csv")
 
+df_incarceration = pd.read_csv("2013-2017_incarceration_usa.csv")
+
 graph_theme = dict(
     layout=go.Layout(title_font=dict(family="Rockwell", size=24))
 )
@@ -83,7 +85,33 @@ app.layout = html.Div([
 ], style={ 'columnCount': 2}),
 html.Div([
     html.H1("A look at Incarceration Rates", style={'text-align':'center'}),
-    dcc.Graph(id='incarceration_figure', figure={}),
+
+        html.Div([
+        dcc.Slider(id='slct_year_inc', min=2005, max=2017, step=None, marks={
+        2013: '2013',
+        2014: '2014',
+        2015: '2015',
+        2016: '2016'
+    }, value=2013),
+
+    dcc.Dropdown(id='slct_type_inc', options=[
+        # total_correctional_pop,csrp_100k_18,csrp_100k_all,parole,comsrp_100k_18,comsrp_100k_all,local_jail_prison,irp_100k_18,irp_100k_all
+        {"label": "Total correctional population", "value": "total_correctional_pop"},
+        {"label": "Correctional supervision rate per 100,000 U.S. residents ages 18 or older", "value": "csrp_100k_18"},
+        {"label": "Correctional supervision rate per 100,000 U.S. residents of all ages", "value": "csrp_100k_all"},
+        {"label": "Number on probation or parole", "value": "parole"},
+        {"label": "Community supervision rate per 100,000 U.S. residents ages 18 or older", "value": "comsrp_100k_18"},
+        {"label": "Community supervision rate per 100,000 U.S. residents of all ages", "value": "comsrp_100k_all"},
+        {"label": "Number in prison or local jail", "value": "local_jail_prison"},
+        {"label": "Incarceration rate per 100,000 U.S. residents ages 18 or older", "value": "irp_100k_18"},
+        {"label": "Incarceration rate per 100,000 U.S. residents of all ages", "value": "irp_100k_all"},
+        ], multi=False,
+        value="total_correctional_pop", style={ 'margin': 'auto'}),
+
+    ], style={'columnCount': 2}),
+
+
+    dcc.Graph(id='incarceration_figure', figure={}, style={'margin': '10px'}),
 ]),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
     id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
@@ -97,9 +125,12 @@ html.Div([
     Output(component_id='incarceration_figure', component_property='figure')],
     [Input(component_id='slct_year', component_property='value'),
     Input(component_id='slct_fndng', component_property='value'),
-    Input(component_id='slct_state', component_property='value')]
+    Input(component_id='slct_state', component_property='value'),
+    Input(component_id='slct_year_inc', component_property='value'),
+    Input(component_id='slct_type_inc', component_property='value')
+    ]
 )
-def update_graph(year, funding, state):
+def update_graph(year, funding, state, year_inc, type_inc):
     # option_slctd refers to value
 
     # data manipulation for the USA map 
@@ -129,7 +160,22 @@ def update_graph(year, funding, state):
         print(df_state)
         fig_state= px.line(df_state,template='plotly_white',x="year", y=funding, title="{funding} for {state} over 2005 - 2017".format(funding=get_proper_name(funding), state=get_state(state)))
 
-    return [fig_usa, fig_state, fig_usa] # the outputs
+    # data for incarceration map 
+    df_incarceration_copy = df_incarceration.copy()
+    df_year_inc = df_incarceration_copy[df_incarceration_copy["year"] == year_inc]
+    
+    # data manipulation for the incarceration fig 
+    fig_incarceration = px.choropleth(
+        data_frame=df_year_inc, 
+        locationmode='USA-states',
+        locations='status_code',
+        scope='usa',
+        color=type_inc,
+        color_continuous_scale="Viridis",
+        template='plotly_white'
+    )
+
+    return [fig_usa, fig_state, fig_incarceration] # the outputs
 
 # run the app 
 if __name__ == "__main__":
