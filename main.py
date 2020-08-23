@@ -159,29 +159,66 @@ html.Div([
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 html.Div([
     html.Div([
-        dcc.Input(type='number', id='elementary_and_secondary_edu', placeholder='Elementary and Secondary', style={'margin':'5px'}, value=1680),
-        dcc.Input(type='number', id='higher_edu', placeholder='Higher Education', style={'margin':'5px'}, value=827),
-        dcc.Input(type='number', id='public_welfare', placeholder='Public Welfare', style={'margin':'5px'}, value=1800),
+        html.Div([
+            html.P("Elementary and Secondary"),
+            dcc.Input(type='number', id='elementary_and_secondary_edu', placeholder='Elementary and Secondary', style={'margin':'5px'}, value=1680),
+        ]),
+        html.Div([
+            html.P("Higher Education"),
+            dcc.Input(type='number', id='higher_edu', placeholder='Higher Education', style={'margin':'5px'}, value=827),
+        ]),
+        html.Div([
+            html.P("Public Welfare"),
+            dcc.Input(type='number', id='public_welfare', placeholder='Public Welfare', style={'margin':'5px'}, value=1800),
+        ]),
     ]),
     html.Div([
-        dcc.Input(type='number', id='health_and_hospitals', placeholder='Health and Hospitals', style={'margin':'5px'}, value=600),
-        dcc.Input(type='number', id='highways', placeholder ='Highways', style={'margin':'5px'}, value=600),
-        dcc.Input(type='number', id='police', placeholder = 'Police', style={'margin':'5px'}, value=300),
+        html.Div([
+            html.P("Health and Hospitals"),
+            dcc.Input(type='number', id='health_and_hospitals', placeholder='Health and Hospitals', style={'margin':'5px'}, value=600),
+
+        ]),
+        html.Div([
+            html.P("Highways"),
+            dcc.Input(type='number', id='highways', placeholder ='Highways', style={'margin':'5px'}, value=600),
+        ]),
+        html.Div([
+            html.P("Police"),
+            dcc.Input(type='number', id='police', placeholder = 'Police', style={'margin':'5px'}, value=300),
+        ])
     ]),
     html.Div([
-        dcc.Input(type='number', id='population_thousands', placeholder='Population in Thousands', style={'margin':'5px'}, value=3500),
-        dcc.Input(type='number', id='hispanic', placeholder='Hispanic', style={'margin':'5px'}, value=16.1),
-        dcc.Input(type='number', id='white', placeholder='White', style={'margin':'5px'}, value=40),
+        html.Div([
+            html.P("Population in Thousands"),
+            dcc.Input(type='number', id='population_thousands', placeholder='Population in Thousands', style={'margin':'5px'}, value=3500),
+        ]),
+        html.Div([
+            html.P("Hispanic"),
+            dcc.Input(type='number', id='hispanic', placeholder='Hispanic', style={'margin':'5px'}, value=16.1),
+        ]),
+        html.Div([
+            html.P("White"),
+            dcc.Input(type='number', id='white', placeholder='White', style={'margin':'5px'}, value=40),
+        ]),
     ]),
     html.Div([
-        dcc.Input(type='number', id='black', placeholder='Black', style={'margin':'5px'}, value=36.6),
-        dcc.Input(type='number', id='asian', placeholder='Asian', style={'margin':'5px'}, value=4.5),
-        dcc.Input(type='number', id='indigneous', placeholder='Indigneous', style={'margin':'5px'}, value = 0.2),
+        html.Div([
+            html.P("Black"),
+            dcc.Input(type='number', id='black', placeholder='Black', style={'margin':'5px'}, value=36.6),
+        ]),
+        html.Div([
+            html.P("Asian"),
+            dcc.Input(type='number', id='asian', placeholder='Asian', style={'margin':'5px'}, value=4.5),
+       ]),
+        html.Div([
+            html.P("Indigneous"),
+            dcc.Input(type='number', id='indigneous', placeholder='Indigneous', style={'margin':'5px'}, value = 0.2),
+        ])
     ]),
-    html.P("Enter spending as per capita and race as a sum of 100.", id='ml_result',
+], style={'columnCount': 4, 'padding': '5px'}),
+html.P("Enter spending as per capita and race as a sum of 100.", id='ml_result',
         style={'background-color': 'white', 
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
-], style={'columnCount': 4, 'padding': '5px'}),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
     id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
 ], style={})
@@ -288,11 +325,15 @@ highways, police, population_thousands, hispanic, white, black, asian, indigneou
     other = 6000
     year = 2015
     total = elementary_and_secondary_edu + higher_edu + public_welfare + health_and_hospitals + highways + police + other
-    list_vals = [total, elementary_and_secondary_edu, higher_edu, public_welfare, health_and_hospitals, highways, police,
-     other, population_thousands, year, hispanic, white, black, asian, indigneous]
+    list_vals = []
     test_predictions = 'Please check your inputs'
-    if (len(list_vals)==15):
-        test_predictions = predict(list_vals)
+    try:
+        list_vals = [total, elementary_and_secondary_edu, higher_edu, public_welfare, health_and_hospitals, highways, police,
+     other, population_thousands, year, hispanic, white, black, asian, indigneous]
+        if (len(list_vals)==15):
+            test_predictions = predict(list_vals)
+    except:
+        test_predictions = 'Please check your inputs'
     return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending, test_predictions] # the outputs
 
 # run the app 
