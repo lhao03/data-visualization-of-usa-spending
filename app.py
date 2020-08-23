@@ -12,7 +12,7 @@ from inputs import to_dataframe
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_path='assets') 
-
+server = app.server
 # import data
 df = pd.read_csv("2004-2017_usa_spending.csv")
 
