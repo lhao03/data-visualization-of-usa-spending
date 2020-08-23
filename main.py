@@ -14,7 +14,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_
 # import data
 df = pd.read_csv("2004-2017_usa_spending.csv")
 
-df_incarceration = pd.read_csv("2013-2017_incarceration_usa.csv")
+df_incarceration = pd.read_csv("2013-2016_incarceration_usa.csv")
 
 graph_theme = dict(
     layout=go.Layout(title_font=dict(family="Rockwell", size=24))
