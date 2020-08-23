@@ -9,14 +9,15 @@ First you need data for a data visualization, so I went hunting for data. The da
             'police','all_other','population_thousands',
             'year','hispanic','white',
             'black','asian','indigneous']. 
- My first model in which I normalised all the features and one-hot encoded the states produced acceptable results, an absolute error of 14000 to 15000, and most total correctional populations are in the 10000 range to 500000 range. However, I was not able to reproduce the same input with user defined values, (I did not know how to normalise and one-hot encode user defined values), so I had to resort to using only user defined values. This lead to an absolute error of about 40000, which is not the best, but I know the reasons behind this increase in error. 
+ My first model in which I normalised all the features and one-hot encoded the states produced acceptable results, an absolute error of 14000 to 15000, and most total correctional populations are in the 10000 range to 500000 range. However, I was not able to reproduce the same input with user defined values, (I did not know how to normalise and one-hot encode user defined values), so I had to resort to using only user defined values. This lead to an absolute error of about 40000, which is not the best, but I know the reasons behind this increase in error. I would also remove outliers and train on correctional population per X amount of people. 
 
 ## What I'd do next time
 I would use alot more data and use more categorical features such as race, gender, and state politcal affiliation, and this also leads on to my second point that I would one-hot these values. Furthermore I would normalise these values as well. 
+
+## To try it out yourself
+`pip` install all the required arguments. Then run `python main.py`.
 
 ### links to data
 - [USA Spending](https://state-local-finance-data.taxpolicycenter.org/pages.cfm)
 - [USA Race Demographs for 2017 from Census](https://www.governing.com/gov-data/census/state-minority-population-data-estimates.html)
 - [USA Incarceration Data](https://www.bjs.gov/)
-
-
