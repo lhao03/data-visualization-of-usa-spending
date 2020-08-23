@@ -7,7 +7,8 @@ import dash_core_components as dcc
 import dash_html_components as html 
 from dash.dependencies import Input, Output
 from states import state_codes, states_names, get_state, get_proper_name
-from model import model
+from model import predict
+from inputs import to_dataframe
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, assets_url_path='assets') 
@@ -153,19 +154,36 @@ html.Div([
     dcc.Graph(id='incarceration_figure_spending', figure={}, style={'margin': '10px'}),
 ]),
  html.H1("Predicting the Total Incarceration Population?", style={'text-align':'center'}),
-        html.P("Enter spending as per capita and race as a sum of 100.",
+        html.P("Enter spending as per capita and race as a sum of 100. The model without normalising or one hot encoding has an error of +/- 45023. With both the measures the error becomes  +/- 14000",
         style={'background-color': 'white','margin': '20px 80px',
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 html.Div([
-    html.Div([]),
-    html.Div([]),
-    html.Div([]),
+    html.Div([
+        dcc.Input(type='number', id='elementary_and_secondary_edu', placeholder='Elementary and Secondary', style={'margin':'5px'}, value=1680),
+        dcc.Input(type='number', id='higher_edu', placeholder='Higher Education', style={'margin':'5px'}, value=827),
+        dcc.Input(type='number', id='public_welfare', placeholder='Public Welfare', style={'margin':'5px'}, value=1800),
+    ]),
+    html.Div([
+        dcc.Input(type='number', id='health_and_hospitals', placeholder='Health and Hospitals', style={'margin':'5px'}, value=600),
+        dcc.Input(type='number', id='highways', placeholder ='Highways', style={'margin':'5px'}, value=600),
+        dcc.Input(type='number', id='police', placeholder = 'Police', style={'margin':'5px'}, value=300),
+    ]),
+    html.Div([
+        dcc.Input(type='number', id='population_thousands', placeholder='Population in Thousands', style={'margin':'5px'}, value=3500),
+        dcc.Input(type='number', id='hispanic', placeholder='Hispanic', style={'margin':'5px'}, value=16.1),
+        dcc.Input(type='number', id='white', placeholder='White', style={'margin':'5px'}, value=40),
+    ]),
+    html.Div([
+        dcc.Input(type='number', id='black', placeholder='Black', style={'margin':'5px'}, value=36.6),
+        dcc.Input(type='number', id='asian', placeholder='Asian', style={'margin':'5px'}, value=4.5),
+        dcc.Input(type='number', id='indigneous', placeholder='Indigneous', style={'margin':'5px'}, value = 0.2),
+    ]),
     html.P("Enter spending as per capita and race as a sum of 100.", id='ml_result',
-        style={'background-color': 'white','margin': 'auto',
+        style={'background-color': 'white', 
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
-], style={'columnCount': 3}),
+], style={'columnCount': 4, 'padding': '5px'}),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
-    id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
+    id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
 ], style={})
 
 
@@ -183,11 +201,25 @@ html.Div([
     Input(component_id='slct_type_inc', component_property='value'),
     Input(component_id='slct_fndng_incar', component_property='value'),
     Input(component_id='slct_year_inc_states', component_property='value'),
+    # for model
+    Input(component_id='elementary_and_secondary_edu', component_property='value'),
+    Input(component_id='higher_edu', component_property='value'),
+    Input(component_id='public_welfare', component_property='value'),
+    Input(component_id='health_and_hospitals', component_property='value'),
+    Input(component_id='highways', component_property='value'),
+    Input(component_id='police', component_property='value'),
+    Input(component_id='population_thousands', component_property='value'),
+    Input(component_id='hispanic', component_property='value'),
+    Input(component_id='white', component_property='value'),
+    Input(component_id='black', component_property='value'),
+    Input(component_id='asian', component_property='value'),
+    Input(component_id='indigneous', component_property='value'),
     ]
 )
-def update_graph(year, funding, state, year_inc, type_inc, funding_total, year_total):
+def update_graph(year, funding, state, year_inc, type_inc, funding_total, year_total,
+elementary_and_secondary_edu, higher_edu, public_welfare, health_and_hospitals, 
+highways, police, population_thousands, hispanic, white, black, asian, indigneous):
     # option_slctd refers to value
-
     # data manipulation for the USA map 
     df_copy = df.copy()
     df_year = df_copy[df_copy["year"] == year]
@@ -251,7 +283,17 @@ def update_graph(year, funding, state, year_inc, type_inc, funding_total, year_t
     yaxis_title=funding_total,
     xaxis_title="Total Correctional Population")
     
-    return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending, 'TEST'] # the outputs
+    # model 
+    # NOT asking for total, other, year
+    other = 6000
+    year = 2015
+    total = elementary_and_secondary_edu + higher_edu + public_welfare + health_and_hospitals + highways + police + other
+    list_vals = [total, elementary_and_secondary_edu, higher_edu, public_welfare, health_and_hospitals, highways, police,
+     other, population_thousands, year, hispanic, white, black, asian, indigneous]
+    test_predictions = 'Please check your inputs'
+    if (len(list_vals)==15):
+        test_predictions = predict(list_vals)
+    return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending, test_predictions] # the outputs
 
 # run the app 
 if __name__ == "__main__":
