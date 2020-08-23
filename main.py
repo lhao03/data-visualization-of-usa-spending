@@ -34,7 +34,7 @@ def make_mappings():
 
 # app layout - components 
 app.layout = html.Div([
-    html.H1("Rate of US Spending", style={'font-weight': 'bold', 'margin':'auto', 'font-size': '50px', 'text-align':'center'}),
+    html.H1("A Visualization of USA Spending", style={'font-weight': 'bold', 'margin':'auto', 'font-size': '50px', 'text-align':'center'}),
     html.P("Select a year and funding category. Spending is represented as dollars per capita. You can also choose to select a state to see their changes in funding over 2005 to 2017.",
         style={'background-color': 'white','margin': '20px 40px', 'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 
@@ -119,7 +119,7 @@ html.Div([
     dcc.Graph(id='incarceration_figure', figure={}, style={'margin': '10px'}),
 ]),
 html.Div([
-    html.H1("How does Spending Impact Incarceration Rates?", style={'text-align':'center'}),
+    html.H1("How does Spending Impact the Total Incarceration Population?", style={'text-align':'center'}),
         html.P("Select a year and incarceration category to see the relationships between spending and race.",
         style={'background-color': 'white','margin': '20px 80px',
          'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
@@ -135,7 +135,7 @@ html.Div([
         {"label": "Highways", "value": "highways"},
         {"label": "Police", "value": "police"},
         {"label": "Other", "value": "all_other"},
-        {"label": "Latino", "value": "latino"},
+        {"label": "Latino", "value": "hispanic"},
         {"label": "Black", "value": "black"},
         {"label": "White", "value": "white"},
         {"label": "Asian", "value": "asian"},
@@ -152,8 +152,17 @@ html.Div([
 
     dcc.Graph(id='incarceration_figure_spending', figure={}, style={'margin': '10px'}),
 ]),
+ html.H1("Predicting the Total Incarceration Population?", style={'text-align':'center'}),
+        html.P("Enter spending as per capita and race as a sum of 100.",
+        style={'background-color': 'white','margin': '20px 80px',
+         'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 html.Div([
-    
+    html.Div([]),
+    html.Div([]),
+    html.Div([]),
+    html.P("Enter spending as per capita and race as a sum of 100.", id='ml_result',
+        style={'background-color': 'white','margin': 'auto',
+         'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
 ], style={'columnCount': 3}),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
     id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
@@ -165,7 +174,8 @@ html.Div([
     [Output(component_id='usa_map', component_property='figure'),
     Output(component_id='state_figure', component_property='figure'),
     Output(component_id='incarceration_figure', component_property='figure'),
-    Output(component_id='incarceration_figure_spending', component_property='figure'),],
+    Output(component_id='incarceration_figure_spending', component_property='figure'),
+     Output(component_id='ml_result', component_property='children'),],
     [Input(component_id='slct_year', component_property='value'),
     Input(component_id='slct_fndng', component_property='value'),
     Input(component_id='slct_state', component_property='value'),
@@ -236,7 +246,12 @@ def update_graph(year, funding, state, year_inc, type_inc, funding_total, year_t
          hoverinfo='text'
     ))
 
-    return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending] # the outputs
+    fig_incarceration_spending.update_layout(
+    title="{category} of {year}".format(category=funding_total, year=year_total),
+    yaxis_title=funding_total,
+    xaxis_title="Total Correctional Population")
+    
+    return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending, 'TEST'] # the outputs
 
 # run the app 
 if __name__ == "__main__":
