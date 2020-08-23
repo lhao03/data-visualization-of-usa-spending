@@ -17,6 +17,8 @@ df = pd.read_csv("2004-2017_usa_spending.csv")
 
 df_incarceration = pd.read_csv("2013-2016_incarceration_usa.csv")
 
+df_spending_incarceration = pd.read_csv('final_df_with_spending_race_incarceration.csv')
+
 graph_theme = dict(
     layout=go.Layout(title_font=dict(family="Rockwell", size=24))
 )
@@ -87,7 +89,8 @@ app.layout = html.Div([
 html.Div([
     html.H1("A look at Incarceration Rates", style={'text-align':'center'}),
     html.P("Select a year and incarceration category.",
-        style={'background-color': 'white','margin': '20px 80px', 'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
+        style={'background-color': 'white','margin': '20px 80px',
+         'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
         html.Div([
         dcc.Slider(id='slct_year_inc', min=2005, max=2017, step=None, marks={
         2013: '2013',
@@ -116,8 +119,42 @@ html.Div([
     dcc.Graph(id='incarceration_figure', figure={}, style={'margin': '10px'}),
 ]),
 html.Div([
-    
+    html.H1("How does Spending Impact Incarceration Rates?", style={'text-align':'center'}),
+        html.P("Select a year and incarceration category to see the relationships between spending and race.",
+        style={'background-color': 'white','margin': '20px 80px',
+         'text-align': 'center', 'padding': '10px', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888', 'font-size':'14px'}),
+     # drop down for usa map   
+
+     html.Div([
+                 dcc.Dropdown(id='slct_fndng_incar', options=[
+        {"label": "Total Spending", "value": "total"},
+        {"label": "Elementary and Secondary Education", "value": "elementary_and_secondary_edu"},
+        {"label": "Higher Education", "value": "higher_edu"},
+        {"label": "Public Welfare", "value": "public_welfare"},
+        {"label": "Health and Hospital", "value": "health_and_hospitals"},
+        {"label": "Highways", "value": "highways"},
+        {"label": "Police", "value": "police"},
+        {"label": "Other", "value": "all_other"},
+        {"label": "Latino", "value": "latino"},
+        {"label": "Black", "value": "black"},
+        {"label": "White", "value": "white"},
+        {"label": "Asian", "value": "asian"},
+        ], multi=False,
+        value="total", style={'width': '50%', 'margin': 'auto'}),
+
+         dcc.Slider(id='slct_year_inc_states', min=2005, max=2017, step=None, marks={
+        2013: '2013',
+        2014: '2014',
+        2015: '2015',
+        2016: '2016'
+    }, value=2013),
+     ], style={'columnCount': 2}),
+
+    dcc.Graph(id='incarceration_figure_spending', figure={}, style={'margin': '10px'}),
 ]),
+html.Div([
+    
+], style={'columnCount': 3}),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
     id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
 ], style={})
@@ -127,15 +164,18 @@ html.Div([
 @app.callback(
     [Output(component_id='usa_map', component_property='figure'),
     Output(component_id='state_figure', component_property='figure'),
-    Output(component_id='incarceration_figure', component_property='figure')],
+    Output(component_id='incarceration_figure', component_property='figure'),
+    Output(component_id='incarceration_figure_spending', component_property='figure'),],
     [Input(component_id='slct_year', component_property='value'),
     Input(component_id='slct_fndng', component_property='value'),
     Input(component_id='slct_state', component_property='value'),
     Input(component_id='slct_year_inc', component_property='value'),
-    Input(component_id='slct_type_inc', component_property='value')
+    Input(component_id='slct_type_inc', component_property='value'),
+    Input(component_id='slct_fndng_incar', component_property='value'),
+    Input(component_id='slct_year_inc_states', component_property='value'),
     ]
 )
-def update_graph(year, funding, state, year_inc, type_inc):
+def update_graph(year, funding, state, year_inc, type_inc, funding_total, year_total):
     # option_slctd refers to value
 
     # data manipulation for the USA map 
@@ -182,7 +222,21 @@ def update_graph(year, funding, state, year_inc, type_inc):
         hover_data=[df_year_inc['region']],
     )
 
-    return [fig_usa, fig_state, fig_incarceration] # the outputs
+    # manipulation for final incarcertation plot
+    df_spending_incarceration_year = df_spending_incarceration[df_spending_incarceration['year'] == year_total]
+    df_spending_incarceration_year = df_spending_incarceration_year.sort_values(by=[funding_total])
+    # frames = [df_spending_incarceration_year.head(), df_spending_incarceration_year.tail()]
+    # df_spending_incarceration_year = pd.concat(frames)
+    fig_incarceration_spending = go.Figure()
+    fig_incarceration_spending.add_trace(go.Scatter(
+        x=df_spending_incarceration_year['total_correctional_pop'],
+        y=df_spending_incarceration_year[funding_total],
+         mode='lines+markers',
+         hovertext=df_spending_incarceration_year['region'],
+         hoverinfo='text'
+    ))
+
+    return [fig_usa, fig_state, fig_incarceration, fig_incarceration_spending] # the outputs
 
 # run the app 
 if __name__ == "__main__":
