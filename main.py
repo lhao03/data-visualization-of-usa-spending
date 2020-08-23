@@ -114,6 +114,9 @@ html.Div([
 
     dcc.Graph(id='incarceration_figure', figure={}, style={'margin': '10px'}),
 ]),
+html.Div([
+    
+]),
     html.P("These data come largely from the US Census Bureau’s Census of Governments and Annual Survey of State and Local Government Finances; additional data are from the US Bureau of Economic Analysis and the US Bureau of Labor Statistics.",
     id='p-info', style={'background-color': 'white', 'margin': '25px', 'text-align': 'center', 'padding': '10px', 'font-size': '10px', 'text-align': 'left', 'borderRadius': '15px', 'box-shadow': '2px 2px #888888'}),
 ], style={})
