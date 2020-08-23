@@ -3,3 +3,6 @@ states_spending.xls
 stats_for_norm.csv
 us_race_demographcs 2017.csv
 jupyter_notebooks
+.vscode
+.ipynb_checkpoints
+__pycache__
